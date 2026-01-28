@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+.Python
+*.so
+
+# Virtualenv
+env/
+venv/
+.venv/
+
+# Django stuff
+*.log
+local_settings.py
+db.sqlite3
+media/
+staticfiles/
+
+# Migrations (optional: keep if you want versioned DB changes)
+# */migrations/
+# !*/migrations/__init__.py
+
+# Environment variables
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tests / Coverage
+.coverage
+htmlcov/
+.tox/
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Node (if any)
+node_modules/
+
+# Secrets
+*.pem
+*.key
