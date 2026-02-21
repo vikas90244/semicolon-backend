@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "allauth.socialaccount.providers.google",
     "users",
+    'upload',
 ]
 
 SOCIAL_ACCOUNT_PROVIDERS = {
@@ -64,11 +65,9 @@ SOCIAL_ACCOUNT_PROVIDERS = {
     }
 }
 
-SOCIALACCOUNT_EMAIL_VERIFICATION="none"
-SOCIALACCOUNT_EMAIL_REQUIRED =False
+
 
 SITE_ID = 1
-REST_USE_JWT = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -85,6 +84,11 @@ MIDDLEWARE = [
     "allauth.account.middleware.AccountMiddleware",
 ]
 
+REST_FRAMEWORK = {
+    "EXCEPTION_HANDLER": "core.api_exception_handler.custom_exception_handler"
+}
+
+
 from datetime import timedelta
 
 SIMPLE_JWT = {
@@ -98,14 +102,19 @@ SIMPLE_JWT = {
     "SIGNING_KEY":"semicolon_x123vkjretdtLT"
 }
 
+
+REST_AUTH = {
+    'USE_JWT': True,
+    'JWT_AUTH_COOKIE': 'semicolon-auth',
+    'JWT_AUTH_REFRESH_COOKIE': 'semicolon-refresh',
+    'USER_DETAILS_SERIALIZER': 'users.serializers.SemicolonUserModelSerializer',
+}
+
 CORS_ORIGIN_ALLOW_ALL = True
 
 AUTH_USER_MODEL = "users.SemicolonUserModel"
 
 
-REST_AUTH_SERIALIZERS = {
-    "USER_DETAILS_SERIALIZERS": 'users.serializers.SemicolonUserModelSerializer'
-}
 
 ROOT_URLCONF = 'core.urls'
 
@@ -137,15 +146,30 @@ DATABASES = {
     }
 }
 
+# Use a set for login methods
+ACCOUNT_LOGIN_METHODS = {'email'}
+
+# Define requirements inside this dictionary
+# This replaces ACCOUNT_EMAIL_REQUIRED and ACCOUNT_SIGNUP_FIELDS list
+ACCOUNT_SIGNUP_FIELDS = ['email*']
+
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+# ACCOUNT_USERNAME_REQUIRED = False
+#
+SOCIALACCOUNT_EMAIL_VERIFICATION="none"
+SOCIALACCOUNT_EMAIL_REQUIRED =False
+SOCIALACCOUNT_AUTO_SIGNUP = True
 
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES" : (
         "rest_framework.permissions.IsAuthenticated",
     ),
     "DEFAULT_AUTHENTICATION_CLASSES":(
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        "dj_rest_auth.utils.JWTCookieAuthentication"
+        "dj_rest_auth.jwt_auth.JWTCookieAuthentication"
     ),
 }
 

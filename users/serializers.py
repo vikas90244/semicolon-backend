@@ -2,7 +2,7 @@ from rest_framework.serializers import ModelSerializer
 from .models import SemicolonUserModel
 from django.conf import settings
 
-class SemiColonUserModelSerializer(ModelSerializer):
+class SemicolonUserModelSerializer(ModelSerializer):
     class Meta:
         model = SemicolonUserModel
         fields = [
