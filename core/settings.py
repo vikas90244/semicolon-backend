@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 import dj_database_url
 from pathlib import Path
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -170,6 +171,8 @@ CORS_ALLOWED_ORIGINS = [
     "https://semicolon-frontend.up.railway.app",
 ]
 
+
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 CORS_ALLOW_CREDENTIALS = True
 
 # Use a set for login methods
