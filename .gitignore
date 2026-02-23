@@ -53,3 +53,6 @@ node_modules/
 # Secrets
 *.pem
 *.key
+
+__pycache__/
+*.py[cod]

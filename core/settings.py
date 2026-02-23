@@ -11,6 +11,14 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dj_database_url
+from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,13 +28,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--!w*q7g3t$t=9l1krz3i)60o(1imvr74qzfs&_lwakac#y$f_!'
+# SECRET_KEY = 'django-insecure--!w*q7g3t$t=9l1krz3i)60o(1imvr74qzfs&_lwakac#y$f_!'
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# # SECURITY WARNING: don't run with debug turned on in production!
+# DEBUG = True
 
-ALLOWED_HOSTS = []
+# ALLOWED_HOSTS = []
 
+DEBUG = os.environ.get("DEBUG", "False") == "True"
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "").split(",")
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # Application definition
 
@@ -99,7 +110,7 @@ SIMPLE_JWT = {
     'UPDATE_LAST_LOGIN':True,
     "USER_ID_FIELD":"userId",
     "USER_ID_CLAIM":"user_id",
-    "SIGNING_KEY":"semicolon_x123vkjretdtLT"
+    "SIGNING_KEY": os.environ.get("JWT_SIGNING_KEY"),
 }
 
 
@@ -110,7 +121,6 @@ REST_AUTH = {
     'USER_DETAILS_SERIALIZER': 'users.serializers.SemicolonUserModelSerializer',
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
 
 AUTH_USER_MODEL = "users.SemicolonUserModel"
 
@@ -139,12 +149,28 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": dj_database_url.config(
+        default=os.environ.get("DATABASE_URL"),
+        conn_max_age=600,
+        ssl_require=True,
+    )
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://semicolon-resumable.up.railway.app",
+    "https://semicolon-frontend.up.railway.app",
+]
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Use a set for login methods
 ACCOUNT_LOGIN_METHODS = {'email'}
@@ -208,3 +234,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")

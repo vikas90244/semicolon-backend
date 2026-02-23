@@ -9,8 +9,6 @@ class SemicolonUserModelSerializer(ModelSerializer):
             "userId",
             "username",
             "email",
-            "password",
-
         ]
 
     def create(self, validated_data):
