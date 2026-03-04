@@ -3,6 +3,7 @@ import os
 import dj_database_url
 from dotenv import load_dotenv
 from datetime import timedelta
+from corsheaders.defaults import default_headers
 
 load_dotenv()
 
@@ -52,9 +53,9 @@ SITE_ID = 1
 # ======================
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -204,3 +205,14 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+
+# allow headers 
+
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "upload-id",
+    "upload-metadata",
+    "upload-offset",
+    "upload-length",
+    "tus-resumable",
+]

@@ -7,8 +7,10 @@ from uuid import uuid4
 class UploadMetadata(models.Model):
     upload_id = models.UUIDField( primary_key= True,  default= uuid4, editable= False )
     filename = models.CharField(max_length=255)
+
+    file_path = models.CharField(max_length=500)
+
     total_chunks = models.IntegerField()
-    uploaded_chunks = models.IntegerField(default=0)
     offset = models.IntegerField(default=0)
     size = models.BigIntegerField()
 

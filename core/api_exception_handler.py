@@ -22,7 +22,7 @@ def _get_error_code(exc):
 
 def _extract_message(data):
     if isinstance(data, dict):
-        val = next(iter(data.values()), "Invalid request")
+        val = next(iter(data.values()),"Invalid request")
         if isinstance(val, list):
             return str(val[0])
         return str(val)
