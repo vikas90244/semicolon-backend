@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from .models import UploadMetadata
 from rest_framework.views import APIView
 from rest_framework import status
@@ -6,20 +5,23 @@ from core.api_response import api_success
 from rest_framework.exceptions import ValidationError
 from .parse_metadata_header import parse_metadata_header
 from pathlib import Path
-from .models import UploadMetadata
+from rest_framework.permissions import IsAuthenticated
+from .serializers import UploadMetadataSerializer
+
 # Create your views here.
 
 
 UPLOAD_DIR = Path("uploads")
 
 class InitUploadView(APIView):
+    permission_classes=[IsAuthenticated,]
     def post(self, request):
         try:
             file_name = request.data.get('filename')
             total_bytes = int(request.data.get('totalbyte'))
             total_chunks = request.data.get('totalchunks')
             chunk_size = request.data.get('chunksize')
-
+            
             if not all([file_name, total_bytes, total_chunks, chunk_size]):
                 raise ValidationError("filename, totalbyte, totalchunks and chunksize are required")
             
@@ -34,7 +36,8 @@ class InitUploadView(APIView):
                 filename=file_name,
                 total_chunks=total_chunks,
                 size = total_bytes,
-                file_path=file_path
+                file_path=file_path,
+                creator=request.user
             )
             upload_url = f"http://localhost:8000/api/upload/receive-chunks/{upload_ticket.upload_id}"
 
@@ -101,3 +104,19 @@ class ReceiveChunkView(APIView):
             )
         except Exception as e:
             print(e)
+
+
+class PreviousFailedUploadView(APIView):
+    permission_classes=[IsAuthenticated, ]
+    def get(self, request):
+        user=request.user
+        failed_uploads = UploadMetadata.objects.filter(creator=user, status="UPLOADING")
+        serializer = UploadMetadataSerializer(failed_uploads, many=True)
+
+        return api_success(
+            data={
+                'failed_uploads':serializer.data
+            },
+            message="success", 
+            status=200
+        )

@@ -1,7 +1,8 @@
 from django.urls import path
-from .views import InitUploadView, ReceiveChunkView
+from .views import InitUploadView, ReceiveChunkView, PreviousFailedUploadView
 
 urlpatterns = [
     path('init', InitUploadView.as_view(), name="upload-init"),
-    path('receive-chunks', ReceiveChunkView.as_view(), name="upload-metadata" )
+    path('receive-chunks', ReceiveChunkView.as_view(), name="upload-metadata" ),
+    path('failed-upload', PreviousFailedUploadView.as_view(), name="failed-upload"),
 ]

@@ -19,11 +19,11 @@ class SemicolonUserModelManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, username, email, password):
+    def create_superuser(self, email, password, username=None):
         user = self.create_user(
-            username,
-            email,
-            password=password
+            email=email,
+            password=password,
+            username=username
         )
         user.is_staff = True
         user.is_superuser = True
@@ -37,7 +37,7 @@ class SemicolonUserModel(AbstractBaseUser, PermissionsMixin):
     email    =models.EmailField(max_length = 100, unique =True, null=False, blank=False)
 
     USERNAME_FIELD = "email"
-    REQUIRED_FIELDS = ["username"]
+    REQUIRED_FIELDS = []
     active = models.BooleanField(default = True)
     is_staff = models.BooleanField(default= False)
     is_superuser = models.BooleanField(default= False)

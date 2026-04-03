@@ -1,13 +1,12 @@
 from django.db import models
 from uuid import uuid4
-
 # Create your models here.
-
+from core.settings import AUTH_USER_MODEL
 
 class UploadMetadata(models.Model):
     upload_id = models.UUIDField( primary_key= True,  default= uuid4, editable= False )
     filename = models.CharField(max_length=255)
-
+    creator= models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="uploads")
     file_path = models.CharField(max_length=500)
 
     total_chunks = models.IntegerField()

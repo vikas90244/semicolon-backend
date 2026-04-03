@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     # Local apps
     "users",
     "upload",
+    "django_celery_beat",
 ]
 
 SITE_ID = 1
@@ -105,6 +106,14 @@ SOCIALACCOUNT_PROVIDERS = {
     "google": {
         "SCOPE": ["profile", "email"],
         "AUTH_PARAMS": {"access_type": "online"},
+        # Use credentials from settings instead of requiring a DB SocialApp record
+        "APP": {
+            "client_id": os.environ.get("GOOGLE_CLIENT_ID", ""),
+            "secret": os.environ.get("GOOGLE_CLIENT_SECRET", ""),
+            "key": "",
+        },
+         # Don't verify id_token signature — fetch user info via access_token instead
+        "ID_TOKEN_VERIFICATION": False,
     }
 }
 
@@ -119,6 +128,8 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "UPDATE_LAST_LOGIN": True,
     "SIGNING_KEY": os.environ.get("JWT_SIGNING_KEY"),
+    "USER_ID_FIELD": "userId",
+    "USER_ID_CLAIM": "user_id",
 }
 
 REST_AUTH = {
@@ -216,3 +227,19 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     "upload-length",
     "tus-resumable",
 ]
+
+# ======================
+# CELERY
+# ======================
+
+CELERY_BROKER_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+CELERY_TIMEZONE = "UTC"
+CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+CELERY_BEAT_SCHEDULE = {
+    "cleanup-stale-uploads-daily": {
+        "task": "upload.tasks.cleanup_stale_uploads",
+        "schedule": 86400,  # every 24 hours
+    },
+}
