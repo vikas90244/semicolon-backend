@@ -34,8 +34,8 @@ class SemicolonUserModelManager(BaseUserManager):
 
 
 class SemicolonUserModel(AbstractBaseUser, PermissionsMixin):
-    userId   =models.CharField(max_length=32, default=uuid4, primary_key=True, editable=False )
-    username =models.CharField(max_length=32, unique=True, null=True, blank=True)
+    userId   =models.CharField(max_length=36, default=uuid4, primary_key=True, editable=False )
+    username =models.CharField(max_length=50, unique=True, null=True, blank=True)
     email    =models.EmailField(max_length = 100, unique =True, null=False, blank=False)
 
     USERNAME_FIELD = "email"
