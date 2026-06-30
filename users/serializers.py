@@ -1,21 +1,25 @@
-from rest_framework.serializers import ModelSerializer
+from rest_framework import serializers
 from .models import SemicolonUserModel
-from django.conf import settings
 
-class SemicolonUserModelSerializer(ModelSerializer):
+
+class SemicolonUserModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = SemicolonUserModel
-        fields = [
-            "userId",
-            "username",
-            "email",
-        ]
+        fields = ["userId", "username", "email"]
+        read_only_fields = ["userId"]
 
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=6)
+    
+    class Meta:
+        model = SemicolonUserModel
+        fields = ["email", "username", "password"]
+    
     def create(self, validated_data):
-        user =SemicolonUserModel.objects.create_user(
-            validated_data["username"],
-            validated_data["email"],
-            validated_data["password"]
+        user = SemicolonUserModel.objects.create_user(
+            email=validated_data["email"],
+            username=validated_data.get("username", validated_data["email"].split('@')[0]),
+            password=validated_data["password"]
         )
-
         return user

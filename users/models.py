@@ -6,14 +6,16 @@ from uuid import uuid4
 
 class SemicolonUserModelManager(BaseUserManager):
 
-    def create_user(self, username, email, password=None):
+    def create_user(self, email, password=None, username=None):
         """
-        Creates a custom user with give fields
+        Creates a custom user with given fields
         """
+        if not email:
+            raise ValueError('Users must have an email address')
 
         user = self.model(
-            username=username,
             email=self.normalize_email(email),
+            username=username or email.split('@')[0],
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -23,7 +25,7 @@ class SemicolonUserModelManager(BaseUserManager):
         user = self.create_user(
             email=email,
             password=password,
-            username=username
+            username=username or email.split('@')[0]
         )
         user.is_staff = True
         user.is_superuser = True

@@ -33,4 +33,6 @@ urllib3==2.6.3
 whitenoise==6.11.0
 celery==5.4.0
 redis==5.2.1
-django-celery-beat==2.7.0
+django-celery-beat>=2.8.0
+django-ratelimit==4.1.0
+django-redis==5.4.0
