@@ -18,16 +18,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Copy and set permissions for entrypoint
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
 # Create uploads directory
 RUN mkdir -p uploads
 
-# Collect static files
-RUN python manage.py collectstatic --noinput || true
+# Expose port (Railway will provide PORT env var)
+EXPOSE $PORT
 
-# Expose port
-EXPOSE 8000
-
-# Run migrations and start server
-CMD python manage.py migrate && \
-    python manage.py create_demo_user && \
-    gunicorn core.wsgi:application --bind 0.0.0.0:8000
+# Use entrypoint script
+ENTRYPOINT ["/entrypoint.sh"]

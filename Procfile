@@ -1,3 +1,3 @@
-web: gunicorn core.wsgi --bind 0.0.0.0:$PORT
+web: gunicorn core.wsgi:application
 worker: celery -A core worker --loglevel=info
 beat: celery -A core beat --loglevel=info
