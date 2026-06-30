@@ -25,7 +25,7 @@ RUN chmod +x /entrypoint.sh
 # Create uploads directory
 RUN mkdir -p uploads
 
-# Expose port (Railway will provide PORT env var)
+# Expose port (Render will provide PORT env var)
 EXPOSE $PORT
 
 # Use entrypoint script
