@@ -152,8 +152,8 @@ class ReceiveChunkView(APIView):
             filename = metadata.get("filename", "unknown_file")
             file_path = UPLOAD_DIR / f"{filename}"
             
-            # Use buffered write for better performance (64KB buffer)
-            with open(file_path, "r+b", buffering=8192*8) as f:
+            # Simple unbuffered write
+            with open(file_path, "r+b") as f:
                 f.seek(upload_offset)
                 f.write(input_data)
                 new_offset = f.tell()
