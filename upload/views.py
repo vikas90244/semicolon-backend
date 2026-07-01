@@ -12,6 +12,7 @@ from django.http import FileResponse, Http404
 from django.utils.decorators import method_decorator
 from django_ratelimit.decorators import ratelimit
 import os
+import gzip
 
 # Create your views here.
 
@@ -151,7 +152,8 @@ class ReceiveChunkView(APIView):
             filename = metadata.get("filename", "unknown_file")
             file_path = UPLOAD_DIR / f"{filename}"
             
-            with open(file_path, "r+b") as f:
+            # Use buffered write for better performance (64KB buffer)
+            with open(file_path, "r+b", buffering=8192*8) as f:
                 f.seek(upload_offset)
                 f.write(input_data)
                 new_offset = f.tell()
