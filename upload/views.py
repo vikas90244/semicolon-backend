@@ -130,9 +130,12 @@ class ReceiveChunkView(APIView):
                     "upload-id, upload-metadata and upload-offset are required!"
                 )
             
-            # Validate upload exists and belongs to user
+            # Validate upload exists and belongs to user (fetch only needed fields)
             try:
-                upload = UploadMetadata.objects.get(upload_id=upload_id, creator=request.user)
+                upload = UploadMetadata.objects.only('upload_id', 'size', 'offset', 'status', 'file_path', 'creator_id').get(
+                    upload_id=upload_id, 
+                    creator=request.user
+                )
             except UploadMetadata.DoesNotExist:
                 raise ValidationError("Upload not found or unauthorized")
             
@@ -152,19 +155,22 @@ class ReceiveChunkView(APIView):
             filename = metadata.get("filename", "unknown_file")
             file_path = UPLOAD_DIR / f"{filename}"
             
-            # Simple unbuffered write
+            # Write chunk to file
             with open(file_path, "r+b") as f:
                 f.seek(upload_offset)
                 f.write(input_data)
                 new_offset = f.tell()
 
-            # Update upload metadata
-            upload.offset = new_offset
-            if new_offset >= upload.size:
-                upload.status = "COMPLETED"
-            else:
-                upload.status = "UPLOADING"
-            upload.save(update_fields=["offset", "status"])
+            # Update upload metadata (only update DB every 10 chunks or on completion)
+            should_update_db = (new_offset >= upload.size) or (upload_offset % (10 * 1024 * 1024) == 0)
+            
+            if should_update_db:
+                upload.offset = new_offset
+                if new_offset >= upload.size:
+                    upload.status = "COMPLETED"
+                else:
+                    upload.status = "UPLOADING"
+                upload.save(update_fields=["offset", "status"])
 
             headers = {
                 'Upload-Offset': str(new_offset),
